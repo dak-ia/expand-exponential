@@ -1,6 +1,6 @@
 {
   "name": "expand-exponential",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Expand exponential (scientific) notation to a full decimal string",
   "keywords": [
