@@ -23,6 +23,9 @@ export default defineConfig(({ command }) => {
     // build
     return {
       ...commonConfig,
+      esbuild: {
+        keepNames: true,
+      },
       build: {
         lib: {
           entry: "./src/index.ts",
