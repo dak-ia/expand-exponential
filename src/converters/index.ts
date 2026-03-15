@@ -1,0 +1,1 @@
+export { expandExponential } from "./expandExponential";
