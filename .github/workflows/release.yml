@@ -14,14 +14,6 @@ on:
         options:
           - "true"
           - "false"
-      publish_github:
-        description: "Publish to GitHub Packages?"
-        required: false
-        default: "true"
-        type: choice
-        options:
-          - "true"
-          - "false"
 
 jobs:
   release-flow:
@@ -47,6 +39,7 @@ jobs:
         uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
           node-version-file: .tool-versions
+          registry-url: https://registry.npmjs.org
       - name: Create release branch
         run: |
           git checkout -b release/${{ github.event.inputs.version }}
@@ -122,18 +115,6 @@ jobs:
             npm publish --access public --registry=https://registry.npmjs.org --tag "$TAG" --provenance
           else
             npm publish --access public --registry=https://registry.npmjs.org --provenance
-          fi
-
-      - name: Publish to GitHub Packages
-        if: ${{ github.event.inputs.publish_github == 'true' }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_GITHUB_TOKEN }}
-        run: |
-          if [[ "${{ github.event.inputs.version }}" == *-* ]]; then
-            TAG=$(echo "${{ github.event.inputs.version }}" | sed -E 's/^[0-9.]+-([a-zA-Z0-9.]+).*$/\1/')
-            npm publish --access public --registry=https://npm.pkg.github.com --tag "$TAG"
-          else
-            npm publish --access public --registry=https://npm.pkg.github.com
           fi
 
       - name: Create PR to main
