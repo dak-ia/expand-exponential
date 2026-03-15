@@ -1,0 +1,147 @@
+name: Release Branch & Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g. 0.1.0 or 0.2.0-beta.1)"
+        required: true
+      publish_npm:
+        description: "Publish to npmjs?"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      publish_github:
+        description: "Publish to GitHub Packages?"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+jobs:
+  release-flow:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        # v6
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+        with:
+          ref: main
+
+      - name: Set up Git
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: Set up Node.js
+        # v6
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
+        with:
+          node-version-file: .tool-versions
+      - name: Create release branch
+        run: |
+          git checkout -b release/${{ github.event.inputs.version }}
+
+      - name: Update package.json version
+        run: |
+          node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('package.json','utf8'));p.version='${{ github.event.inputs.version }}';fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\n')"
+
+      - name: Install dependencies & Update package-lock.json
+        run: npm i
+
+      - name: Test
+        run: npm run test:coverage
+
+      - name: Commit and push release branch
+        run: |
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to ${{ github.event.inputs.version }}"
+          git push origin release/${{ github.event.inputs.version }}
+
+      - name: Create and push tag
+        run: |
+          git tag ${{ github.event.inputs.version }}
+          git push origin ${{ github.event.inputs.version }}
+
+      - name: Create GitHub Release
+        run: |
+          # 最新リリースタグを取得
+          LATEST_TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
+          if [[ -z "$LATEST_TAG" ]]; then
+            # 初回リリースの場合は--notes-start-tagを省略
+            if [[ "${{ github.event.inputs.version }}" == *-* ]]; then
+              gh release create ${{ github.event.inputs.version }} \
+                --target release/${{ github.event.inputs.version }} \
+                --title ${{ github.event.inputs.version }} \
+                --generate-notes \
+                --prerelease
+            else
+              gh release create ${{ github.event.inputs.version }} \
+                --target release/${{ github.event.inputs.version }} \
+                --title ${{ github.event.inputs.version }} \
+                --generate-notes \
+                --latest
+            fi
+          else
+            if [[ "${{ github.event.inputs.version }}" == *-* ]]; then
+              gh release create ${{ github.event.inputs.version }} \
+                --target release/${{ github.event.inputs.version }} \
+                --title ${{ github.event.inputs.version }} \
+                --generate-notes \
+                --notes-start-tag "$LATEST_TAG" \
+                --prerelease
+            else
+              gh release create ${{ github.event.inputs.version }} \
+                --target release/${{ github.event.inputs.version }} \
+                --title ${{ github.event.inputs.version }} \
+                --generate-notes \
+                --notes-start-tag "$LATEST_TAG" \
+                --latest
+            fi
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to npmjs
+        if: ${{ github.event.inputs.publish_npm == 'true' }}
+        run: |
+          if [[ "${{ github.event.inputs.version }}" == *-* ]]; then
+            TAG=$(echo "${{ github.event.inputs.version }}" | sed -E 's/^[0-9.]+-([a-zA-Z0-9.]+).*$/\1/')
+            npm publish --access public --registry=https://registry.npmjs.org --tag "$TAG" --provenance
+          else
+            npm publish --access public --registry=https://registry.npmjs.org --provenance
+          fi
+
+      - name: Publish to GitHub Packages
+        if: ${{ github.event.inputs.publish_github == 'true' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_GITHUB_TOKEN }}
+        run: |
+          if [[ "${{ github.event.inputs.version }}" == *-* ]]; then
+            TAG=$(echo "${{ github.event.inputs.version }}" | sed -E 's/^[0-9.]+-([a-zA-Z0-9.]+).*$/\1/')
+            npm publish --access public --registry=https://npm.pkg.github.com --tag "$TAG"
+          else
+            npm publish --access public --registry=https://npm.pkg.github.com
+          fi
+
+      - name: Create PR to main
+        run: |
+          gh pr create \
+            --head "release/${{ github.event.inputs.version }}" \
+            --base "main" \
+            --title "Merge release/${{ github.event.inputs.version }} into main" \
+            --body "Automated PR to merge release branch into main after release."
+        env:
+          GH_TOKEN: ${{ github.token }}
