@@ -1,8 +1,7 @@
-import { ExpandExponentialError } from "../constants";
 import { ExpandExponentialErrorBase } from "./ExpandExponentialErrorBase";
 
 export class InvalidInputError extends ExpandExponentialErrorBase {
-  public override name: ExpandExponentialError = ExpandExponentialError.InvalidInputError;
+  public override readonly name = "InvalidInputError";
   constructor(message = "Expected a valid number format.") {
     super(message);
   }
