@@ -8,13 +8,12 @@ import { InvalidArgumentError, InvalidInputError, ResultOverflowError } from "..
  * - "-1.5e4" → "-15000"
  * @param number - The number or string to expand (e.g., 1.23e5, "1.23e5")
  * @returns Expanded decimal string without exponential notation
- * @throws {InvalidArgumentError} If null, undefined, or not a number/string
- * @throws {InvalidInputError} If NaN, Infinity, or invalid exponential notation
+ * @throws {InvalidArgumentError} If not a number or string
+ * @throws {InvalidInputError} If empty, NaN, Infinity, or invalid exponential notation
  * @throws {ResultOverflowError} If the result string exceeds maximum string length
  */
 export function expandExponential(number: string | number): string {
-  // null / undefined / 引数なし
-  if (number === null || number === undefined) {
+  if (typeof number !== "number" && typeof number !== "string") {
     throw new InvalidArgumentError();
   }
 
@@ -29,11 +28,6 @@ export function expandExponential(number: string | number): string {
   }
 
   const normalizedInput = typeof number === "number" ? number.toString() : number;
-
-  // 空文字チェック
-  if (normalizedInput === "") {
-    throw new InvalidArgumentError();
-  }
 
   // string型の NaN / Infinity チェック
   if (/^[+-]?(Infinity|NaN)$/i.test(normalizedInput)) {
