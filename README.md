@@ -70,8 +70,8 @@ Non-exponential numeric strings are returned as-is.
 - **引数 / Parameters**: `number` (`string | number`) - 展開する数値または文字列 / The number or string to expand
 - **戻り値 / Returns**: `string` - 展開された10進数文字列 / Expanded decimal string
 - **例外 / Throws**:
-  - `InvalidArgumentError` - `null`, `undefined`, 空文字の場合 / If `null`, `undefined`, or empty string
-  - `InvalidInputError` - `NaN`, `Infinity`, 不正な形式の場合 / If `NaN`, `Infinity`, or invalid format
+  - `InvalidArgumentError` - 数値でも文字列でもない場合 / If not a number or string
+  - `InvalidInputError` - 空文字, `NaN`, `Infinity`, 不正な形式の場合 / If empty string, `NaN`, `Infinity`, or invalid format
   - `ResultOverflowError` - 結果文字列が最大長を超える場合 / If result exceeds max string length
 
 **例 / Examples**:
@@ -117,12 +117,13 @@ expandExponential(42); // "42"
 
 ### サポートされていない入力 / Unsupported Input
 
-| 入力 / Input                       | エラー / Error         |
-| ---------------------------------- | ---------------------- |
-| `null`, `undefined`, `""`          | `InvalidArgumentError` |
-| `NaN`, `Infinity`                  | `InvalidInputError`    |
-| `"abc"`, `"1.2.3e5"`               | `InvalidInputError`    |
-| `"1e999999999"` (結果が巨大すぎる) | `ResultOverflowError`  |
+| 入力 / Input                                                 | エラー / Error         |
+| ------------------------------------------------------------ | ---------------------- |
+| `null`, `undefined`, `true`, `{}`                            | `InvalidArgumentError` |
+| `[1]`, `Symbol()`, `10n`, `new String()` (number/string以外) | `InvalidArgumentError` |
+| `""`, `NaN`, `Infinity`                                      | `InvalidInputError`    |
+| `"abc"`, `"1.2.3e5"`                                         | `InvalidInputError`    |
+| `"1e999999999"` (結果が巨大すぎる)                           | `ResultOverflowError`  |
 
 ---
 
@@ -145,11 +146,11 @@ try {
 }
 ```
 
-| エラークラス / Error Class | 発生条件 / Condition                                              |
-| -------------------------- | ----------------------------------------------------------------- |
-| `InvalidArgumentError`     | `null`, `undefined`, 空文字 / `null`, `undefined`, empty string   |
-| `InvalidInputError`        | `NaN`, `Infinity`, 不正な形式 / `NaN`, `Infinity`, invalid format |
-| `ResultOverflowError`      | 結果が文字列最大長を超過 / Result exceeds max string length       |
+| エラークラス / Error Class | 発生条件 / Condition                                                                    |
+| -------------------------- | --------------------------------------------------------------------------------------- |
+| `InvalidArgumentError`     | 数値でも文字列でもない / Not a number or string                                         |
+| `InvalidInputError`        | 空文字, `NaN`, `Infinity`, 不正な形式 / Empty string, `NaN`, `Infinity`, invalid format |
+| `ResultOverflowError`      | 結果が文字列最大長を超過 / Result exceeds max string length                             |
 
 ---
 

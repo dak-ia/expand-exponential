@@ -132,14 +132,47 @@ describe("expandExponential", () => {
   });
 
   describe("InvalidArgumentError", () => {
-    test("null / undefined / 空文字 / 引数なし", () => {
+    test("null / undefined / 引数なし", () => {
       // @ts-expect-error - Testing invalid input
       expect(() => expandExponential(null)).toThrow(InvalidArgumentError);
       // @ts-expect-error - Testing invalid input
       expect(() => expandExponential(undefined)).toThrow(InvalidArgumentError);
-      expect(() => expandExponential("")).toThrow(InvalidArgumentError);
       // @ts-expect-error - Testing invalid input
       expect(() => expandExponential()).toThrow(InvalidArgumentError);
+    });
+
+    test("boolean / object / 関数", () => {
+      // @ts-expect-error - Testing invalid input
+      expect(() => expandExponential(true)).toThrow(InvalidArgumentError);
+      // @ts-expect-error - Testing invalid input
+      expect(() => expandExponential(false)).toThrow(InvalidArgumentError);
+      // @ts-expect-error - Testing invalid input
+      expect(() => expandExponential({})).toThrow(InvalidArgumentError);
+      // @ts-expect-error - Testing invalid input
+      expect(() => expandExponential(new Date())).toThrow(InvalidArgumentError);
+      // @ts-expect-error - Testing invalid input
+      expect(() => expandExponential(parseInt)).toThrow(InvalidArgumentError);
+    });
+
+    test("配列", () => {
+      // @ts-expect-error - Testing invalid input
+      expect(() => expandExponential([])).toThrow(InvalidArgumentError);
+      // @ts-expect-error - Testing invalid input
+      expect(() => expandExponential([1])).toThrow(InvalidArgumentError);
+    });
+
+    test("symbol / bigint", () => {
+      // @ts-expect-error - Testing invalid input
+      expect(() => expandExponential(Symbol("x"))).toThrow(InvalidArgumentError);
+      // @ts-expect-error - Testing invalid input
+      expect(() => expandExponential(10n)).toThrow(InvalidArgumentError);
+    });
+
+    test("String / Numberオブジェクト", () => {
+      // @ts-expect-error - Testing invalid input
+      expect(() => expandExponential(new String("1e5"))).toThrow(InvalidArgumentError);
+      // @ts-expect-error - Testing invalid input
+      expect(() => expandExponential(new Number(5))).toThrow(InvalidArgumentError);
     });
   });
 
@@ -189,6 +222,10 @@ describe("expandExponential", () => {
       expect(() => expandExponential("1.23ee5")).toThrow(InvalidInputError);
       expect(() => expandExponential("1.23e+")).toThrow(InvalidInputError);
       expect(() => expandExponential("1.23e-")).toThrow(InvalidInputError);
+    });
+
+    test("空文字", () => {
+      expect(() => expandExponential("")).toThrow(InvalidInputError);
     });
 
     test("数値でない文字列", () => {
