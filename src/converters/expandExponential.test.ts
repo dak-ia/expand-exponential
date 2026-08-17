@@ -1,4 +1,4 @@
-import { ExpandExponentialErrorBase, InvalidArgumentError, InvalidInputError, ResultOverflowError } from "../errors";
+import { ExpandExponentialError, InvalidArgumentError, InvalidInputError, ResultOverflowError } from "../errors";
 import { expandExponential } from "./expandExponential";
 
 describe("expandExponential", () => {
@@ -243,11 +243,11 @@ describe("expandExponential", () => {
   });
 
   describe("エラー階層", () => {
-    test("すべてのエラーがExpandExponentialErrorBaseを継承している", () => {
-      expect(() => expandExponential("abc")).toThrow(ExpandExponentialErrorBase);
+    test("すべてのエラーがExpandExponentialErrorを継承している", () => {
+      expect(() => expandExponential("abc")).toThrow(ExpandExponentialError);
       // @ts-expect-error - Testing invalid input
-      expect(() => expandExponential(null)).toThrow(ExpandExponentialErrorBase);
-      expect(() => expandExponential("1e999999999")).toThrow(ExpandExponentialErrorBase);
+      expect(() => expandExponential(null)).toThrow(ExpandExponentialError);
+      expect(() => expandExponential("1e999999999")).toThrow(ExpandExponentialError);
     });
   });
 });

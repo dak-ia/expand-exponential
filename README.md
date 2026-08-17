@@ -129,10 +129,10 @@ expandExponential(42); // "42"
 
 ## ⚠️ エラーハンドリング / Error Handling
 
-すべてのエラーは `ExpandExponentialErrorBase` を継承しています。
+すべてのエラーは `ExpandExponentialError` を継承しています。
 エラーの種別ごとにキャッチできます。
 
-All errors extend `ExpandExponentialErrorBase`.
+All errors extend `ExpandExponentialError`.
 You can catch errors by specific type.
 
 ```javascript

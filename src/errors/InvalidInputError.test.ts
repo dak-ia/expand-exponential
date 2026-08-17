@@ -1,4 +1,4 @@
-import { ExpandExponentialErrorBase } from "./ExpandExponentialErrorBase";
+import { ExpandExponentialError } from "./ExpandExponentialError";
 import { InvalidInputError } from "./InvalidInputError";
 
 describe("InvalidInputError", () => {
@@ -14,9 +14,9 @@ describe("InvalidInputError", () => {
     expect(new InvalidInputError("custom").message).toBe("custom");
   });
 
-  test("ExpandExponentialErrorBaseとErrorを継承している", () => {
+  test("ExpandExponentialErrorとErrorを継承している", () => {
     const error = new InvalidInputError();
-    expect(error).toBeInstanceOf(ExpandExponentialErrorBase);
+    expect(error).toBeInstanceOf(ExpandExponentialError);
     expect(error).toBeInstanceOf(Error);
   });
 });
