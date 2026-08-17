@@ -1,5 +1,5 @@
 import {
-  ExpandExponentialErrorBase,
+  ExpandExponentialError,
   InvalidArgumentError,
   InvalidInputError,
   ResultOverflowError,
@@ -13,9 +13,9 @@ describe("index", () => {
   });
 
   test("エラークラスをexportしている", () => {
-    expect(ExpandExponentialErrorBase).toBeDefined();
-    expect(new InvalidArgumentError()).toBeInstanceOf(ExpandExponentialErrorBase);
-    expect(new InvalidInputError()).toBeInstanceOf(ExpandExponentialErrorBase);
-    expect(new ResultOverflowError()).toBeInstanceOf(ExpandExponentialErrorBase);
+    expect(ExpandExponentialError).toBeDefined();
+    expect(new InvalidArgumentError()).toBeInstanceOf(ExpandExponentialError);
+    expect(new InvalidInputError()).toBeInstanceOf(ExpandExponentialError);
+    expect(new ResultOverflowError()).toBeInstanceOf(ExpandExponentialError);
   });
 });

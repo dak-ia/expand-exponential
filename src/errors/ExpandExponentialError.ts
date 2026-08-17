@@ -1,4 +1,4 @@
-export class ExpandExponentialErrorBase extends Error {
+export class ExpandExponentialError extends Error {
   public override readonly name: string = "ExpandExponentialError";
   constructor(message: string) {
     super(message);

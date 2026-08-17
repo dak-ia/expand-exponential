@@ -1,4 +1,4 @@
-import { ExpandExponentialErrorBase } from "./ExpandExponentialErrorBase";
+import { ExpandExponentialError } from "./ExpandExponentialError";
 import { ResultOverflowError } from "./ResultOverflowError";
 
 describe("ResultOverflowError", () => {
@@ -14,9 +14,9 @@ describe("ResultOverflowError", () => {
     expect(new ResultOverflowError("custom").message).toBe("custom");
   });
 
-  test("ExpandExponentialErrorBaseとErrorを継承している", () => {
+  test("ExpandExponentialErrorとErrorを継承している", () => {
     const error = new ResultOverflowError();
-    expect(error).toBeInstanceOf(ExpandExponentialErrorBase);
+    expect(error).toBeInstanceOf(ExpandExponentialError);
     expect(error).toBeInstanceOf(Error);
   });
 });
